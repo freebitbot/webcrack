@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import { splitForLoopVars } from '../transforms';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import { splitForLoopVars } from '../transforms'
 
-const expectJS = testTransform(splitForLoopVars);
+const expectJS = testTransform(splitForLoopVars)
 
 test('extract a single unused var', () =>
   expectJS(`
@@ -10,7 +10,7 @@ test('extract a single unused var', () =>
   `).toMatchInlineSnapshot(`
     var i = 0;
     for (;;) {}
-  `));
+  `))
 
 test('extract the first unused vars and keep the rest', () =>
   expectJS(`
@@ -19,7 +19,7 @@ test('extract the first unused vars and keep the rest', () =>
     var i = 0;
     var j = 1;
     for (var k = 2; k < 5; k++) {}
-  `));
+  `))
 
 test('ignore let in for loop initializer', () => {
   expectJS(`
@@ -28,7 +28,7 @@ test('ignore let in for loop initializer', () => {
   `).toMatchInlineSnapshot(`
     let i;
     for (let i = 0, j = 1;;) {}
-  `);
+  `)
 
   expectJS(`
     for (let i = 0, j = 1;;) {
@@ -40,5 +40,5 @@ test('ignore let in for loop initializer', () => {
       setTimeout(() => console.log(i));
       if (++i > 3) break;
     }
-  `);
-});
+  `)
+})

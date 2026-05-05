@@ -1,18 +1,18 @@
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import { constMemberExpression, type Transform } from '../../ast-utils';
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import { constMemberExpression, type Transform } from '../../ast-utils'
 
 export default {
   name: 'default-parameters',
-  tags: ['safe'],
   scope: true,
+  tags: ['safe'],
   visitor() {
-    const defaultExpression = m.capture(m.anyExpression());
-    const index = m.capture(m.numericLiteral());
-    const varName = m.capture(m.identifier());
+    const defaultExpression = m.capture(m.anyExpression())
+    const index = m.capture(m.numericLiteral())
+    const varName = m.capture(m.identifier())
     const varId = m.capture(
       m.or(m.identifier(), m.arrayPattern(), m.objectPattern()),
-    );
+    )
 
     // Example: arguments.length > 0 && arguments[0] !== undefined
     const argumentCheckAnd = m.logicalExpression(
@@ -31,7 +31,7 @@ export default {
         ),
         m.identifier('undefined'),
       ),
-    );
+    )
     // Example: arguments.length > 0 && arguments[0] !== undefined
     const argumentCheckOr = m.logicalExpression(
       '||',
@@ -49,7 +49,7 @@ export default {
         ),
         m.identifier('undefined'),
       ),
-    );
+    )
     // Example: arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
     const defaultParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
@@ -64,7 +64,7 @@ export default {
           defaultExpression,
         ),
       ),
-    ]);
+    ])
     // Example: arguments.length > 0 && arguments[0] !== undefined && arguments[0];
     const defaultFalseParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
@@ -79,7 +79,7 @@ export default {
           ),
         ),
       ),
-    ]);
+    ])
     // Example: arguments.length <= 0 || arguments[0] === undefined || arguments[0]
     const defaultTrueParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
@@ -94,7 +94,7 @@ export default {
           ),
         ),
       ),
-    ]);
+    ])
 
     // Example: if (x === undefined) { x = 1; }
     const defaultParamLoose = m.ifStatement(
@@ -108,7 +108,7 @@ export default {
           ),
         ),
       ]),
-    );
+    )
     // Example: var y = arguments.length > 1 ? arguments[1] : undefined;
     const normalParam = m.variableDeclaration(undefined, [
       m.variableDeclarator(
@@ -127,13 +127,32 @@ export default {
           m.identifier('undefined'),
         ),
       ),
-    ]);
+    ])
 
     return {
+      IfStatement: {
+        exit(path) {
+          const fn = path.parentPath.parent
+          if (!t.isFunction(fn) || path.key !== 0) return
+          if (!defaultParamLoose.match(path.node)) return
+
+          const binding = path.scope.getOwnBinding(varName.current!.name)
+          if (!binding) return
+          const isFunctionParam =
+            binding.path.listKey === 'params' && binding.path.parent === fn
+          if (!isFunctionParam) return
+
+          binding.path.replaceWith(
+            t.assignmentPattern(varName.current!, defaultExpression.current!),
+          )
+          path.remove()
+          this.changes++
+        },
+      },
       VariableDeclaration: {
         exit(path) {
-          const fn = path.parentPath.parent;
-          if (!t.isFunction(fn) || path.key !== 0) return;
+          const fn = path.parentPath.parent
+          if (!t.isFunction(fn) || path.key !== 0) return
 
           const newParam = defaultParam.match(path.node)
             ? t.assignmentPattern(varId.current!, defaultExpression.current!)
@@ -143,36 +162,17 @@ export default {
                 ? t.assignmentPattern(varId.current!, t.booleanLiteral(true))
                 : normalParam.match(path.node)
                   ? varId.current!
-                  : null;
-          if (!newParam) return;
+                  : null
+          if (!newParam) return
 
           for (let i = fn.params.length; i < index.current!.value; i++) {
-            fn.params[i] = t.identifier(path.scope.generateUid('param'));
+            fn.params[i] = t.identifier(path.scope.generateUid('param'))
           }
-          fn.params[index.current!.value] = newParam;
-          path.remove();
-          this.changes++;
+          fn.params[index.current!.value] = newParam
+          path.remove()
+          this.changes++
         },
       },
-      IfStatement: {
-        exit(path) {
-          const fn = path.parentPath.parent;
-          if (!t.isFunction(fn) || path.key !== 0) return;
-          if (!defaultParamLoose.match(path.node)) return;
-
-          const binding = path.scope.getOwnBinding(varName.current!.name);
-          if (!binding) return;
-          const isFunctionParam =
-            binding.path.listKey === 'params' && binding.path.parent === fn;
-          if (!isFunctionParam) return;
-
-          binding.path.replaceWith(
-            t.assignmentPattern(varName.current!, defaultExpression.current!),
-          );
-          path.remove();
-          this.changes++;
-        },
-      },
-    };
+    }
   },
-} satisfies Transform;
+} satisfies Transform

@@ -1,11 +1,11 @@
-import { posix } from 'node:path';
+import { posix } from 'node:path'
 
-const { dirname, join, relative } = posix;
+const { dirname, join, relative } = posix
 
 export function relativePath(from: string, to: string): string {
-  if (to.startsWith('node_modules/')) return to.replace('node_modules/', '');
-  const relativePath = relative(dirname(from), to);
-  return relativePath.startsWith('.') ? relativePath : './' + relativePath;
+  if (to.startsWith('node_modules/')) return to.replace('node_modules/', '')
+  const relativePath = relative(dirname(from), to)
+  return relativePath.startsWith('.') ? relativePath : './' + relativePath
 }
 
 /**
@@ -18,27 +18,27 @@ export function resolveDependencyTree(
   tree: Record<string, Record<string, string>>,
   entry: string,
 ): Record<string, string> {
-  const paths = resolveTreePaths(tree, entry);
-  paths[entry] = './index.js';
+  const paths = resolveTreePaths(tree, entry)
+  paths[entry] = './index.js'
 
   const entryDepth = Object.values(paths).reduce(
     (acc, path) => Math.max(acc, path.split('..').length),
     0,
-  );
+  )
   // If the entrypoint is in a subfolder, we need to make up a prefix to get rid of the `../`
   const prefix = Array(entryDepth - 1)
     .fill(0)
     .map((_, i) => `tmp${i}`)
-    .join('/');
+    .join('/')
 
   return Object.fromEntries(
     Object.entries(paths).map(([id, path]) => {
       const newPath = path.startsWith('node_modules/')
         ? path
-        : join(prefix, path);
-      return [id, newPath];
+        : join(prefix, path)
+      return [id, newPath]
     }),
-  );
+  )
 }
 
 /**
@@ -50,24 +50,24 @@ function resolveTreePaths(
   cwd = '.',
   paths: Record<string, string> = {},
 ) {
-  const entries = Object.entries(graph[entry]);
+  const entries = Object.entries(graph[entry])
 
   for (const [id, name] of entries) {
-    const isCircular = Object.hasOwn(paths, id);
-    if (isCircular) continue;
+    const isCircular = Object.hasOwn(paths, id)
+    if (isCircular) continue
 
-    let path: string;
+    let path: string
     if (name.startsWith('.')) {
-      path = join(cwd, name);
-      if (!path.endsWith('.js')) path += '.js';
+      path = join(cwd, name)
+      if (!path.endsWith('.js')) path += '.js'
     } else {
-      path = join('node_modules', name, 'index.js');
+      path = join('node_modules', name, 'index.js')
     }
-    paths[id] = path;
+    paths[id] = path
 
-    const newCwd = path.endsWith('.js') ? dirname(path) : path;
-    resolveTreePaths(graph, id, newCwd, paths);
+    const newCwd = path.endsWith('.js') ? dirname(path) : path
+    resolveTreePaths(graph, id, newCwd, paths)
   }
 
-  return paths;
+  return paths
 }

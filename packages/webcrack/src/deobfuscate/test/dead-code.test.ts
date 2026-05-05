@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import deadCode from '../dead-code';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import deadCode from '../dead-code'
 
-const expectJS = testTransform(deadCode);
+const expectJS = testTransform(deadCode)
 
 test('keep true branch', () =>
   expectJS(`
@@ -11,7 +11,7 @@ test('keep true branch', () =>
     } else {
       console.log("bar");
     }
-  `).toMatchInlineSnapshot(`console.log("foo");`));
+  `).toMatchInlineSnapshot(`console.log("foo");`))
 
 test('keep false branch', () =>
   expectJS(`
@@ -20,14 +20,14 @@ test('keep false branch', () =>
     } else {
       console.log("bar");
     }
-  `).toMatchInlineSnapshot(`console.log("bar");`));
+  `).toMatchInlineSnapshot(`console.log("bar");`))
 
 test('remove false branch without else', () =>
   expectJS(`
     if ("a" !== "a") {
       console.log("foo");
     }
-  `).toMatchInlineSnapshot(``));
+  `).toMatchInlineSnapshot(``))
 
 test('merge scopes', () =>
   expectJS(`
@@ -38,4 +38,4 @@ test('merge scopes', () =>
   `).toMatchInlineSnapshot(`
     let foo = 1;
     let _foo = 2;
-  `));
+  `))

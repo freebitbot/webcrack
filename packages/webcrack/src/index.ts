@@ -42,8 +42,8 @@ export type { Plugin } from './plugin'
 type Matchers = typeof m
 
 export interface WebcrackResult {
-  code: string
   bundle: Bundle | undefined
+  code: string
   /**
    * Save the deobfuscated code and the extracted bundle to the given directory.
    * @param path Output directory
@@ -53,34 +53,20 @@ export interface WebcrackResult {
 
 export interface Options {
   /**
-   * Decompile react components to JSX.
-   * @default true
-   */
-  jsx?: boolean
-  /**
-   * Extract modules from the bundle.
-   * @default true
-   */
-  unpack?: boolean
-  /**
    * Deobfuscate the code.
    * @default true
    */
   deobfuscate?: boolean
   /**
-   * Unminify the code. Required for some of the deobfuscate/unpack/jsx transforms.
+   * Decompile react components to JSX.
    * @default true
    */
-  unminify?: boolean
+  jsx?: boolean
   /**
    * Mangle variable names.
    * @default false
    */
   mangle?: boolean | ((id: string) => boolean)
-  /**
-   * Run AST transformations after specific stages
-   */
-  plugins?: Partial<Record<Stage, Plugin[]>>
   /**
    * Assigns paths to modules based on the given matchers.
    * This will also rewrite `require()` calls to use the new paths.
@@ -94,26 +80,40 @@ export interface Options {
    */
   mappings?: (m: Matchers) => Record<string, m.Matcher<unknown>>
   /**
+   * @param progress Progress in percent (0-100)
+   */
+  onProgress?: (progress: number) => void
+  /**
+   * Run AST transformations after specific stages
+   */
+  plugins?: Partial<Record<Stage, Plugin[]>>
+  /**
    * Function that executes a code expression and returns the result (typically from the obfuscator).
    */
   sandbox?: Sandbox
   /**
-   * @param progress Progress in percent (0-100)
+   * Unminify the code. Required for some of the deobfuscate/unpack/jsx transforms.
+   * @default true
    */
-  onProgress?: (progress: number) => void
+  unminify?: boolean
+  /**
+   * Extract modules from the bundle.
+   * @default true
+   */
+  unpack?: boolean
 }
 
 function mergeOptions(options: Options): asserts options is Required<Options> {
   const mergedOptions: Required<Options> = {
-    jsx: true,
-    unminify: true,
-    unpack: true,
     deobfuscate: true,
+    jsx: true,
     mangle: false,
-    plugins: options.plugins ?? {},
     mappings: () => ({}),
     onProgress: () => {},
+    plugins: options.plugins ?? {},
     sandbox: isBrowser() ? createBrowserSandbox() : createNodeSandbox(),
+    unminify: true,
+    unpack: true,
     ...options,
   }
   Object.assign(options, mergedOptions)
@@ -149,10 +149,10 @@ export async function webcrack(
   const stages = [
     () => {
       ast = parse(code, {
-        sourceType: 'unambiguous',
         allowReturnOutsideFunction: true,
         errorRecovery: true,
         plugins: ['jsx'],
+        sourceType: 'unambiguous',
       })
       if (ast.errors?.length) {
         debug('webcrack:parse')('Recovered from parse errors', ast.errors)
@@ -216,8 +216,8 @@ export async function webcrack(
   }
 
   return {
-    code: outputCode,
     bundle,
+    code: outputCode,
     async save(path) {
       const { mkdir, writeFile } = await import('node:fs/promises')
       path = normalize(path)

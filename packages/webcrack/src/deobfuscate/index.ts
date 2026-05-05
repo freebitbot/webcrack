@@ -24,8 +24,6 @@ export { createBrowserSandbox, createNodeSandbox, type Sandbox }
 
 export default {
   name: 'deobfuscate',
-  tags: ['unsafe'],
-  scope: true,
   async run(ast, state, sandbox) {
     if (!sandbox) return
 
@@ -76,4 +74,6 @@ export default {
       { noScope: true },
     ).changes
   },
+  scope: true,
+  tags: ['unsafe'],
 } satisfies AsyncTransform<Sandbox>

@@ -24,8 +24,8 @@ import mergeStrings from '../unminify/transforms/merge-strings'
 
 export default {
   name: 'control-flow-object',
-  tags: ['safe'],
   scope: true,
+  tags: ['safe'],
   visitor() {
     const varId = m.capture(m.identifier())
     const propertyName = m.matcher<string>((name) => /^[a-z]{5}$/i.test(name))
@@ -227,11 +227,6 @@ export default {
           this.changes += transform(path)
         },
       },
-      VariableDeclarator: {
-        exit(path) {
-          this.changes += transform(path)
-        },
-      },
       MemberExpression: {
         exit(path) {
           if (!inlineMatcher.match(path.node)) return
@@ -250,6 +245,11 @@ export default {
             path.replaceWith(value)
           }
           this.changes++
+        },
+      },
+      VariableDeclarator: {
+        exit(path) {
+          this.changes += transform(path)
         },
       },
     }

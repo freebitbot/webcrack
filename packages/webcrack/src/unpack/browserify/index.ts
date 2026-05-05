@@ -1,19 +1,19 @@
-import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import type { Transform } from '../../ast-utils';
-import { constKey, getPropName, iife, renameParameters } from '../../ast-utils';
-import type { Bundle } from '../bundle';
-import { resolveDependencyTree } from '../path';
-import { BrowserifyBundle } from './bundle';
-import { BrowserifyModule } from './module';
+import type { NodePath } from '@babel/traverse'
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import type { Transform } from '../../ast-utils'
+import { constKey, getPropName, iife, renameParameters } from '../../ast-utils'
+import type { Bundle } from '../bundle'
+import { resolveDependencyTree } from '../path'
+import { BrowserifyBundle } from './bundle'
+import { BrowserifyModule } from './module'
 
 export const unpackBrowserify = {
   name: 'unpack-browserify',
-  tags: ['unsafe'],
   scope: true,
+  tags: ['unsafe'],
   visitor(options) {
-    const modules = new Map<string, BrowserifyModule>();
+    const modules = new Map<string, BrowserifyModule>()
 
     const files = m.capture(
       m.arrayOf(
@@ -38,11 +38,11 @@ export const unpackBrowserify = {
           ]),
         ),
       ),
-    );
+    )
     // TODO: support multiple entry points
     const entryIdMatcher = m.capture(
       m.or(m.numericLiteral(), m.stringLiteral()),
-    );
+    )
 
     const matcher = m.callExpression(
       m.or(
@@ -70,34 +70,33 @@ export const unpackBrowserify = {
         m.objectExpression(),
         m.arrayExpression(m.anyList(entryIdMatcher, m.zeroOrMore())),
       ],
-    );
+    )
 
     return {
       CallExpression(path) {
-        if (!matcher.match(path.node)) return;
-        path.stop();
+        if (!matcher.match(path.node)) return
+        path.stop()
 
-        const entryId = entryIdMatcher.current!.value.toString();
+        const entryId = entryIdMatcher.current!.value.toString()
 
         const modulesPath = path.get(
           files.currentKeys!.join('.'),
-        ) as NodePath<t.ObjectProperty>[];
+        ) as NodePath<t.ObjectProperty>[]
 
-        const dependencyTree: Record<string, Record<string, string>> = {};
+        const dependencyTree: Record<string, Record<string, string>> = {}
 
         for (const moduleWrapper of modulesPath) {
-          const id = getPropName(moduleWrapper.node.key)!;
+          const id = getPropName(moduleWrapper.node.key)!
           const fn = moduleWrapper.get(
             'value.elements.0',
-          ) as NodePath<t.FunctionExpression>;
+          ) as NodePath<t.FunctionExpression>
 
-          const dependencies: Record<string, string> = (dependencyTree[id] =
-            {});
+          const dependencies: Record<string, string> = (dependencyTree[id] = {})
           const dependencyProperties = (
             moduleWrapper.get(
               'value.elements.1',
             ) as NodePath<t.ObjectExpression>
-          ).node.properties as t.ObjectProperty[];
+          ).node.properties as t.ObjectProperty[]
 
           for (const dependency of dependencyProperties) {
             // skip external dependencies like { vscode: undefined }
@@ -105,36 +104,36 @@ export const unpackBrowserify = {
               dependency.value.type !== 'NumericLiteral' &&
               dependency.value.type !== 'StringLiteral'
             )
-              continue;
+              continue
 
-            const filePath = getPropName(dependency.key)!;
-            const depId = dependency.value.value.toString();
-            dependencies[depId] = filePath;
+            const filePath = getPropName(dependency.key)!
+            const depId = dependency.value.value.toString()
+            dependencies[depId] = filePath
           }
 
-          renameParameters(fn, ['require', 'module', 'exports']);
-          const file = t.file(t.program(fn.node.body.body));
+          renameParameters(fn, ['require', 'module', 'exports'])
+          const file = t.file(t.program(fn.node.body.body))
           const module = new BrowserifyModule(
             id,
             file,
             id === entryId,
             dependencies,
-          );
-          modules.set(id.toString(), module);
+          )
+          modules.set(id.toString(), module)
         }
 
-        const resolvedPaths = resolveDependencyTree(dependencyTree, entryId);
+        const resolvedPaths = resolveDependencyTree(dependencyTree, entryId)
 
         for (const module of modules.values()) {
           if (Object.hasOwn(resolvedPaths, module.id)) {
-            module.path = resolvedPaths[module.id];
+            module.path = resolvedPaths[module.id]
           }
         }
 
         if (modules.size > 0) {
-          options!.bundle = new BrowserifyBundle(entryId, modules);
+          options!.bundle = new BrowserifyBundle(entryId, modules)
         }
       },
-    };
+    }
   },
-} satisfies Transform<{ bundle: Bundle | undefined }>;
+} satisfies Transform<{ bundle: Bundle | undefined }>

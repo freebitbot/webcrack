@@ -1,9 +1,9 @@
-import type { Binding, NodePath } from '@babel/traverse';
-import traverse from '@babel/traverse';
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import { getPropName } from '.';
-import { findParent } from './matcher';
+import type { Binding, NodePath } from '@babel/traverse'
+import traverse from '@babel/traverse'
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import { getPropName } from '.'
+import { findParent } from './matcher'
 
 /**
  * Replace all references of a variable with the initializer.
@@ -20,46 +20,46 @@ export function inlineVariable(
   value = m.anyExpression(),
   unsafeAssignments = false,
 ) {
-  const varDeclarator = binding.path.node;
+  const varDeclarator = binding.path.node
   const varMatcher = m.variableDeclarator(
     m.identifier(binding.identifier.name),
     value,
-  );
+  )
   const assignmentMatcher = m.assignmentExpression(
     '=',
     m.identifier(binding.identifier.name),
     value,
-  );
+  )
 
   if (binding.constant && varMatcher.match(varDeclarator)) {
     binding.referencePaths.forEach((ref) => {
-      ref.replaceWith(varDeclarator.init!);
-    });
-    binding.path.remove();
+      ref.replaceWith(varDeclarator.init!)
+    })
+    binding.path.remove()
   } else if (unsafeAssignments && binding.constantViolations.length >= 1) {
     const assignments = binding.constantViolations
       .map((path) => path.node)
-      .filter((node) => assignmentMatcher.match(node));
-    if (!assignments.length) return;
+      .filter((node) => assignmentMatcher.match(node))
+    if (!assignments.length) return
 
     function getNearestAssignment(location: number) {
-      return assignments.findLast((assignment) => assignment.start! < location);
+      return assignments.findLast((assignment) => assignment.start! < location)
     }
 
     for (const ref of binding.referencePaths) {
-      const assignment = getNearestAssignment(ref.node.start!);
-      if (assignment) ref.replaceWith(assignment.right);
+      const assignment = getNearestAssignment(ref.node.start!)
+      if (assignment) ref.replaceWith(assignment.right)
     }
 
     for (const path of binding.constantViolations) {
       if (path.parentPath?.isExpressionStatement()) {
-        path.remove();
+        path.remove()
       } else if (path.isAssignmentExpression()) {
-        path.replaceWith(path.node.right);
+        path.replaceWith(path.node.right)
       }
     }
 
-    binding.path.remove();
+    binding.path.remove()
   }
 }
 
@@ -74,11 +74,11 @@ export function inlineArrayElements(
   references: NodePath[],
 ): void {
   for (const reference of references) {
-    const memberPath = reference.parentPath! as NodePath<t.MemberExpression>;
-    const property = memberPath.node.property as t.NumericLiteral;
-    const index = property.value;
-    const replacement = array.elements[index]!;
-    memberPath.replaceWith(t.cloneNode(replacement));
+    const memberPath = reference.parentPath! as NodePath<t.MemberExpression>
+    const property = memberPath.node.property as t.NumericLiteral
+    const index = property.value
+    const replacement = array.elements[index]!
+    memberPath.replaceWith(t.cloneNode(replacement))
   }
 }
 
@@ -86,35 +86,35 @@ export function inlineObjectProperties(
   binding: Binding,
   property = m.objectProperty(),
 ): void {
-  const varDeclarator = binding.path.node;
-  const objectProperties = m.capture(m.arrayOf(property));
+  const varDeclarator = binding.path.node
+  const objectProperties = m.capture(m.arrayOf(property))
   const varMatcher = m.variableDeclarator(
     m.identifier(binding.identifier.name),
     m.objectExpression(objectProperties),
-  );
-  if (!varMatcher.match(varDeclarator)) return;
+  )
+  if (!varMatcher.match(varDeclarator)) return
 
   const propertyMap = new Map(
     objectProperties.current!.map((p) => [getPropName(p.key), p.value]),
-  );
+  )
   if (
     !binding.referencePaths.every((ref) => {
-      const member = ref.parent as t.MemberExpression;
-      const propName = getPropName(member.property)!;
-      return propertyMap.has(propName);
+      const member = ref.parent as t.MemberExpression
+      const propName = getPropName(member.property)!
+      return propertyMap.has(propName)
     })
   )
-    return;
+    return
 
   binding.referencePaths.forEach((ref) => {
-    const memberPath = ref.parentPath as NodePath<t.MemberExpression>;
-    const propName = getPropName(memberPath.node.property)!;
-    const value = propertyMap.get(propName)!;
+    const memberPath = ref.parentPath as NodePath<t.MemberExpression>
+    const propName = getPropName(memberPath.node.property)!
+    const value = propertyMap.get(propName)!
 
-    memberPath.replaceWith(value);
-  });
+    memberPath.replaceWith(value)
+  })
 
-  binding.path.remove();
+  binding.path.remove()
 }
 
 /**
@@ -135,31 +135,31 @@ export function inlineFunctionCall(
         caller.node.arguments[0] as t.Identifier,
         caller.node.arguments.slice(1),
       ),
-    );
-    return;
+    )
+    return
   }
 
-  const returnedValue = (fn.body.body[0] as t.ReturnStatement).argument!;
-  const clone = t.cloneNode(returnedValue, true);
+  const returnedValue = (fn.body.body[0] as t.ReturnStatement).argument!
+  const clone = t.cloneNode(returnedValue, true)
 
   // Inline all arguments
   traverse(clone, {
     Identifier(path) {
       const paramIndex = fn.params.findIndex(
         (p) => (p as t.Identifier).name === path.node.name,
-      );
+      )
       if (paramIndex !== -1) {
         path.replaceWith(
           caller.node.arguments[paramIndex] ??
             t.unaryExpression('void', t.numericLiteral(0)),
-        );
-        path.skip();
+        )
+        path.skip()
       }
     },
     noScope: true,
-  });
+  })
 
-  caller.replaceWith(clone);
+  caller.replaceWith(clone)
 }
 
 /**
@@ -169,42 +169,42 @@ export function inlineFunctionCall(
  * `decode(1077 - 938, 1071)`
  */
 export function inlineFunctionAliases(binding: Binding): { changes: number } {
-  const state = { changes: 0 };
-  const refs = [...binding.referencePaths];
+  const state = { changes: 0 }
+  const refs = [...binding.referencePaths]
   for (const ref of refs) {
-    const fn = findParent(ref, m.functionDeclaration());
+    const fn = findParent(ref, m.functionDeclaration())
 
     // E.g. alias
-    const fnName = m.capture(m.anyString());
+    const fnName = m.capture(m.anyString())
     // E.g. decode(b - 938, a)
     const returnedCall = m.capture(
       m.callExpression(
         m.identifier(binding.identifier.name),
         m.anyList(m.slice({ min: 2 })),
       ),
-    );
+    )
     const matcher = m.functionDeclaration(
       m.identifier(fnName),
       m.anyList(m.slice({ min: 2 })),
       m.blockStatement([m.returnStatement(returnedCall)]),
-    );
+    )
 
     if (fn && matcher.match(fn.node)) {
       // Avoid false positives of functions that return a string
       // It's only a wrapper if the function's params are used in the decode call
       const paramUsedInDecodeCall = fn.node.params.some((param) => {
-        const binding = fn.scope.getBinding((param as t.Identifier).name);
+        const binding = fn.scope.getBinding((param as t.Identifier).name)
         return binding?.referencePaths.some((ref) =>
           ref.findParent((p) => p.node === returnedCall.current),
-        );
-      });
-      if (!paramUsedInDecodeCall) continue;
+        )
+      })
+      if (!paramUsedInDecodeCall) continue
 
-      const fnBinding = fn.scope.parent.getBinding(fnName.current!);
-      if (!fnBinding) continue;
+      const fnBinding = fn.scope.parent.getBinding(fnName.current!)
+      if (!fnBinding) continue
       // Check all further aliases (`function alias2(a, b) { return alias(a - 1, b + 3); }`)
-      const fnRefs = fnBinding.referencePaths;
-      refs.push(...fnRefs);
+      const fnRefs = fnBinding.referencePaths
+      refs.push(...fnRefs)
 
       // E.g. [alias(1071, 1077), alias(1, 2)]
       const callRefs = fnRefs
@@ -213,21 +213,21 @@ export function inlineFunctionAliases(binding: Binding): { changes: number } {
             t.isCallExpression(ref.parent) &&
             t.isIdentifier(ref.parent.callee, { name: fnName.current! }),
         )
-        .map((ref) => ref.parentPath!) as NodePath<t.CallExpression>[];
+        .map((ref) => ref.parentPath!) as NodePath<t.CallExpression>[]
 
       for (const callRef of callRefs) {
-        inlineFunctionCall(fn.node, callRef);
-        state.changes++;
+        inlineFunctionCall(fn.node, callRef)
+        state.changes++
       }
 
-      fn.remove();
-      state.changes++;
+      fn.remove()
+      state.changes++
     }
   }
 
   // Have to crawl again because renaming messed up the references
-  binding.scope.crawl();
-  return state;
+  binding.scope.crawl()
+  return state
 }
 
 /**
@@ -241,9 +241,9 @@ export function inlineVariableAliases(
   binding: Binding,
   targetName = binding.identifier.name,
 ): { changes: number } {
-  const state = { changes: 0 };
-  const refs = [...binding.referencePaths];
-  const varName = m.capture(m.anyString());
+  const state = { changes: 0 }
+  const refs = [...binding.referencePaths]
+  const varName = m.capture(m.anyString())
   const matcher = m.or(
     m.variableDeclarator(
       m.identifier(varName),
@@ -254,41 +254,41 @@ export function inlineVariableAliases(
       m.identifier(varName),
       m.identifier(binding.identifier.name),
     ),
-  );
+  )
 
   for (const ref of refs) {
     if (matcher.match(ref.parent)) {
-      const varScope = ref.scope;
-      const varBinding = varScope.getBinding(varName.current!);
-      if (!varBinding) continue;
+      const varScope = ref.scope
+      const varBinding = varScope.getBinding(varName.current!)
+      if (!varBinding) continue
       // Avoid infinite loop from `alias = alias;` (caused by dead code injection?)
-      if (ref.isIdentifier({ name: varBinding.identifier.name })) continue;
+      if (ref.isIdentifier({ name: varBinding.identifier.name })) continue
 
       // Check all further aliases (`var alias2 = alias;`)
-      state.changes += inlineVariableAliases(varBinding, targetName).changes;
+      state.changes += inlineVariableAliases(varBinding, targetName).changes
 
       if (ref.parentPath?.isAssignmentExpression()) {
         // Remove `var alias;` when the assignment happens separately
-        varBinding.path.remove();
+        varBinding.path.remove()
 
         if (t.isExpressionStatement(ref.parentPath.parent)) {
           // Remove `alias = decoder;`
-          ref.parentPath.remove();
+          ref.parentPath.remove()
         } else {
           // Replace `(alias = decoder)(1);` with `decoder(1);`
-          ref.parentPath.replaceWith(t.identifier(targetName));
+          ref.parentPath.replaceWith(t.identifier(targetName))
         }
       } else if (ref.parentPath?.isVariableDeclarator()) {
         // Remove `alias = decoder;` of declarator
-        ref.parentPath.remove();
+        ref.parentPath.remove()
       }
-      state.changes++;
+      state.changes++
     } else {
       // Rename the reference
-      ref.replaceWith(t.identifier(targetName));
-      state.changes++;
+      ref.replaceWith(t.identifier(targetName))
+      state.changes++
     }
   }
 
-  return state;
+  return state
 }

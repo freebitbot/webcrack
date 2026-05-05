@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import splitVariableDeclarations from '../transforms/split-variable-declarations';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import splitVariableDeclarations from '../transforms/split-variable-declarations'
 
-const expectJS = testTransform(splitVariableDeclarations);
+const expectJS = testTransform(splitVariableDeclarations)
 
 test('split variable declarations', () =>
   expectJS(`
@@ -11,7 +11,7 @@ test('split variable declarations', () =>
     const a = 1;
     const b = 2;
     const c = 3;
-  `));
+  `))
 
 test('split exported variable declarations', () =>
   expectJS(`
@@ -20,7 +20,7 @@ test('split exported variable declarations', () =>
     export const a = 1;
     export const b = 2;
     export const c = 3;
-  `));
+  `))
 
 test('split var in for loop initializer', () =>
   expectJS(`
@@ -29,7 +29,7 @@ test('split var in for loop initializer', () =>
     var i = 0;
     var j = 1;
     for (;;) {}
-  `));
+  `))
 
 test('ignore let in for loop initializer', () => {
   expectJS(`
@@ -38,7 +38,7 @@ test('ignore let in for loop initializer', () => {
   `).toMatchInlineSnapshot(`
     let i;
     for (let i = 0, j = 1;;) {}
-  `);
+  `)
 
   expectJS(`
     for (let i = 0, j = 1;;) {
@@ -50,8 +50,8 @@ test('ignore let in for loop initializer', () => {
       setTimeout(() => console.log(i));
       if (++i > 3) break;
     }
-  `);
-});
+  `)
+})
 
 test('ignore for loop with test or update', () =>
   expectJS(`
@@ -61,4 +61,4 @@ test('ignore for loop with test or update', () =>
       var a;
       var b;
     }
-  `));
+  `))

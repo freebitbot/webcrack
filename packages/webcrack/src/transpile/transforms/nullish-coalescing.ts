@@ -1,16 +1,16 @@
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import type { Transform } from '../../ast-utils';
-import { isTemporaryVariable } from '../../ast-utils';
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import type { Transform } from '../../ast-utils'
+import { isTemporaryVariable } from '../../ast-utils'
 
 export default {
   name: 'nullish-coalescing',
-  tags: ['safe'],
   scope: true,
+  tags: ['safe'],
   visitor() {
-    const tmpVar = m.capture(m.identifier());
-    const left = m.capture(m.anyExpression());
-    const right = m.capture(m.anyExpression());
+    const tmpVar = m.capture(m.identifier())
+    const left = m.capture(m.anyExpression())
+    const right = m.capture(m.anyExpression())
     // Example (Babel): var _tmp; (_tmp = left) !== null && _tmp !== undefined ? _tmp : right;
     const idMatcher = m.conditionalExpression(
       m.logicalExpression(
@@ -28,7 +28,7 @@ export default {
       ),
       m.fromCapture(tmpVar),
       right,
-    );
+    )
 
     const idLooseMatcher = m.conditionalExpression(
       m.binaryExpression(
@@ -38,7 +38,7 @@ export default {
       ),
       m.fromCapture(tmpVar),
       right,
-    );
+    )
 
     // Example (SWC/esbuild): left != null ? left : (left = right);
     // Example (TS): left !== null && left !== undefined ? left : (left = right);
@@ -57,7 +57,7 @@ export default {
       ),
       m.fromCapture(left),
       right,
-    );
+    )
 
     const iifeMatcher = m.callExpression(
       m.arrowFunctionExpression(
@@ -66,13 +66,13 @@ export default {
         false,
       ),
       [],
-    );
+    )
 
     return {
       ConditionalExpression: {
         exit(path) {
           if (idMatcher.match(path.node)) {
-            const binding = path.scope.getBinding(tmpVar.current!.name);
+            const binding = path.scope.getBinding(tmpVar.current!.name)
 
             if (
               iifeMatcher.match(path.parentPath.parent) &&
@@ -80,32 +80,32 @@ export default {
             ) {
               path.parentPath.parentPath!.replaceWith(
                 t.logicalExpression('??', left.current!, right.current!),
-              );
-              this.changes++;
+              )
+              this.changes++
             } else if (isTemporaryVariable(binding, 2, 'var')) {
-              binding.path.remove();
+              binding.path.remove()
               path.replaceWith(
                 t.logicalExpression('??', left.current!, right.current!),
-              );
-              this.changes++;
+              )
+              this.changes++
             }
           } else if (idLooseMatcher.match(path.node)) {
-            const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!isTemporaryVariable(binding, 1)) return;
+            const binding = path.scope.getBinding(tmpVar.current!.name)
+            if (!isTemporaryVariable(binding, 1)) return
 
-            binding.path.remove();
+            binding.path.remove()
             path.replaceWith(
               t.logicalExpression('??', left.current!, right.current!),
-            );
-            this.changes++;
+            )
+            this.changes++
           } else if (simpleIdMatcher.match(path.node)) {
             path.replaceWith(
               t.logicalExpression('??', left.current!, right.current!),
-            );
-            this.changes++;
+            )
+            this.changes++
           }
         },
       },
-    };
+    }
   },
-} satisfies Transform;
+} satisfies Transform

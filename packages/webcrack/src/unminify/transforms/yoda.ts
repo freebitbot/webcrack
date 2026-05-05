@@ -1,23 +1,23 @@
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import type { Transform } from '../../ast-utils';
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import type { Transform } from '../../ast-utils'
 
 // https://eslint.org/docs/latest/rules/yoda and https://babeljs.io/docs/en/babel-plugin-minify-flip-comparisons
 
 const FLIPPED_OPERATORS = {
-  '==': '==',
-  '===': '===',
   '!=': '!=',
   '!==': '!==',
-  '>': '<',
-  '<': '>',
-  '>=': '<=',
-  '<=': '>=',
   '*': '*',
-  '^': '^',
   '&': '&',
+  '^': '^',
+  '<': '>',
+  '<=': '>=',
+  '==': '==',
+  '===': '===',
+  '>': '<',
+  '>=': '<=',
   '|': '|',
-} as const;
+} as const
 
 export default {
   name: 'yoda',
@@ -35,12 +35,12 @@ export default {
       m.identifier('undefined'),
       m.identifier('NaN'),
       m.identifier('Infinity'),
-    );
+    )
     const matcher = m.binaryExpression(
       m.or(...Object.values(FLIPPED_OPERATORS)),
       pureValue,
       m.matcher((node) => !pureValue.match(node)),
-    );
+    )
 
     return {
       BinaryExpression: {
@@ -54,11 +54,11 @@ export default {
                 path.node.right,
                 path.node.left as t.Expression,
               ),
-            );
-            this.changes++;
+            )
+            this.changes++
           }
         },
       },
-    };
+    }
   },
-} satisfies Transform;
+} satisfies Transform

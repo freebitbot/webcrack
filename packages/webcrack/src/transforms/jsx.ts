@@ -1,13 +1,13 @@
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import type { Transform } from '../ast-utils';
-import { codePreview, constMemberExpression } from '../ast-utils';
-import { generateUid } from '../ast-utils/scope';
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import type { Transform } from '../ast-utils'
+import { codePreview, constMemberExpression } from '../ast-utils'
+import { generateUid } from '../ast-utils/scope'
 
 export default {
   name: 'jsx',
-  tags: ['unsafe'],
   scope: true,
+  tags: ['unsafe'],
   visitor: () => {
     const deepIdentifierMemberExpression = m.memberExpression(
       m.or(
@@ -16,7 +16,7 @@ export default {
       ),
       m.identifier(),
       false,
-    );
+    )
 
     const type = m.capture(
       m.or(
@@ -24,8 +24,8 @@ export default {
         m.stringLiteral(), // React.createElement('div', ...)
         deepIdentifierMemberExpression, // React.createElement(Component.SubComponent, ...)
       ),
-    );
-    const props = m.capture(m.or(m.objectExpression(), m.nullLiteral()));
+    )
+    const props = m.capture(m.or(m.objectExpression(), m.nullLiteral()))
 
     // React.createElement(type, props, ...children)
     const elementMatcher = m.callExpression(
@@ -35,7 +35,7 @@ export default {
         props,
         m.zeroOrMore(m.or(m.anyExpression(), m.spreadElement())),
       ),
-    );
+    )
 
     // React.createElement(React.Fragment, null, ...children)
     const fragmentMatcher = m.callExpression(
@@ -45,7 +45,7 @@ export default {
         m.nullLiteral(),
         m.zeroOrMore(m.or(m.anyExpression(), m.spreadElement())),
       ),
-    );
+    )
 
     return {
       CallExpression: {
@@ -53,17 +53,17 @@ export default {
           if (fragmentMatcher.match(path.node)) {
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[],
-            );
-            const opening = t.jsxOpeningFragment();
-            const closing = t.jsxClosingFragment();
-            const fragment = t.jsxFragment(opening, closing, children);
-            path.node.leadingComments = null;
-            path.replaceWith(fragment);
-            this.changes++;
+            )
+            const opening = t.jsxOpeningFragment()
+            const closing = t.jsxClosingFragment()
+            const fragment = t.jsxFragment(opening, closing, children)
+            path.node.leadingComments = null
+            path.replaceWith(fragment)
+            this.changes++
           }
 
           if (elementMatcher.match(path.node)) {
-            let name = convertType(type.current!);
+            let name = convertType(type.current!)
 
             // rename component to avoid conflict with built-in html tags
             // https://react.dev/reference/react/createElement#caveats
@@ -71,31 +71,31 @@ export default {
               t.isIdentifier(type.current) &&
               /^[a-z]/.test(type.current.name)
             ) {
-              const binding = path.scope.getBinding(type.current.name);
-              if (!binding) return;
-              name = t.jsxIdentifier(generateUid(path.scope, 'Component'));
-              path.scope.rename(type.current.name, name.name);
+              const binding = path.scope.getBinding(type.current.name)
+              if (!binding) return
+              name = t.jsxIdentifier(generateUid(path.scope, 'Component'))
+              path.scope.rename(type.current.name, name.name)
             }
 
             const attributes = t.isObjectExpression(props.current)
               ? convertAttributes(props.current)
-              : [];
+              : []
             const children = convertChildren(
               path.node.arguments.slice(2) as t.Expression[],
-            );
-            const selfClosing = children.length === 0;
-            const opening = t.jsxOpeningElement(name, attributes, selfClosing);
-            const closing = t.jsxClosingElement(name);
-            const element = t.jsxElement(opening, closing, children);
-            path.node.leadingComments = null;
-            path.replaceWith(element);
-            this.changes++;
+            )
+            const selfClosing = children.length === 0
+            const opening = t.jsxOpeningElement(name, attributes, selfClosing)
+            const closing = t.jsxClosingElement(name)
+            const element = t.jsxElement(opening, closing, children)
+            path.node.leadingComments = null
+            path.replaceWith(element)
+            this.changes++
           }
         },
       },
-    };
+    }
   },
-} satisfies Transform;
+} satisfies Transform
 
 /**
  * - `Component` -> `Component`
@@ -106,15 +106,13 @@ function convertType(
   type: t.Identifier | t.MemberExpression | t.StringLiteral,
 ): t.JSXIdentifier | t.JSXMemberExpression {
   if (t.isIdentifier(type)) {
-    return t.jsxIdentifier(type.name);
+    return t.jsxIdentifier(type.name)
   } else if (t.isStringLiteral(type)) {
-    return t.jsxIdentifier(type.value);
+    return t.jsxIdentifier(type.value)
   } else {
-    const object = convertType(
-      type.object as t.Identifier | t.MemberExpression,
-    );
-    const property = t.jsxIdentifier((type.property as t.Identifier).name);
-    return t.jsxMemberExpression(object, property);
+    const object = convertType(type.object as t.Identifier | t.MemberExpression)
+    const property = t.jsxIdentifier((type.property as t.Identifier).name)
+    return t.jsxMemberExpression(object, property)
   }
 }
 
@@ -126,33 +124,33 @@ function convertType(
 function convertAttributes(
   object: t.ObjectExpression,
 ): (t.JSXAttribute | t.JSXSpreadAttribute)[] {
-  const name = m.capture(m.anyString());
-  const value = m.capture(m.anyExpression());
+  const name = m.capture(m.anyString())
+  const value = m.capture(m.anyExpression())
   const matcher = m.objectProperty(
     m.or(m.identifier(name), m.stringLiteral(name)),
     value,
-  );
+  )
 
   return object.properties.map((property) => {
     if (matcher.match(property)) {
-      const jsxName = t.jsxIdentifier(name.current!);
+      const jsxName = t.jsxIdentifier(name.current!)
       if (value.current!.type === 'StringLiteral') {
-        const hasSpecialChars = /["\\]/.test(value.current.value);
+        const hasSpecialChars = /["\\]/.test(value.current.value)
         const jsxValue = hasSpecialChars
           ? t.jsxExpressionContainer(value.current)
-          : value.current;
-        return t.jsxAttribute(jsxName, jsxValue);
+          : value.current
+        return t.jsxAttribute(jsxName, jsxValue)
       }
-      const jsxValue = t.jsxExpressionContainer(value.current!);
-      return t.jsxAttribute(jsxName, jsxValue);
+      const jsxValue = t.jsxExpressionContainer(value.current!)
+      return t.jsxAttribute(jsxName, jsxValue)
     } else if (t.isSpreadElement(property)) {
-      return t.jsxSpreadAttribute(property.argument);
+      return t.jsxSpreadAttribute(property.argument)
     } else {
       throw new Error(
         `jsx: property type not implemented ${codePreview(object)}`,
-      );
+      )
     }
-  });
+  })
 }
 
 function convertChildren(
@@ -160,16 +158,16 @@ function convertChildren(
 ): (t.JSXText | t.JSXElement | t.JSXSpreadChild | t.JSXExpressionContainer)[] {
   return children.map((child) => {
     if (t.isJSXElement(child)) {
-      return child;
+      return child
     } else if (t.isStringLiteral(child)) {
-      const hasSpecialChars = /[{}<>\r\n]/.test(child.value);
+      const hasSpecialChars = /[{}<>\r\n]/.test(child.value)
       return hasSpecialChars
         ? t.jsxExpressionContainer(child)
-        : t.jsxText(child.value);
+        : t.jsxText(child.value)
     } else if (t.isSpreadElement(child)) {
-      return t.jsxSpreadChild(child.argument);
+      return t.jsxSpreadChild(child.argument)
     } else {
-      return t.jsxExpressionContainer(child);
+      return t.jsxExpressionContainer(child)
     }
-  });
+  })
 }

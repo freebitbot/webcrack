@@ -1,8 +1,8 @@
-(function (e, f) {
+;(function (e, f) {
   var l = c,
     k = d,
     j = b,
-    g = e();
+    g = e()
   while (!![]) {
     try {
       var h =
@@ -12,42 +12,42 @@
         (parseInt(k(0x171)) / 0x6) * (-parseInt(l(0x172, 'GeF7')) / 0x7) +
         parseInt(j(0x168)) / 0x8 +
         (parseInt(j(0x169)) / 0x9) * (-parseInt(l(0x173, 'Fymz')) / 0xa) +
-        (parseInt(j(0x174)) / 0xb) * (parseInt(j(0x16c)) / 0xc);
-      if (h === f) break;
-      else g['push'](g['shift']());
+        (parseInt(j(0x174)) / 0xb) * (parseInt(j(0x16c)) / 0xc)
+      if (h === f) break
+      else g['push'](g['shift']())
     } catch (i) {
-      g['push'](g['shift']());
+      g['push'](g['shift']())
     }
   }
-})(a, 0x796de);
+})(a, 0x796de)
 function hi() {
   var n = c,
-    m = b;
-  console[m(0x175)](n(0x176, '#(#D'));
+    m = b
+  console[m(0x175)](n(0x176, '#(#D'))
 }
 function d(b, c) {
-  var e = a();
+  var e = a()
   return (
     (d = function (f, g) {
-      f = f - 0x161;
-      var h = e[f];
-      return h;
+      f = f - 0x161
+      var h = e[f]
+      return h
     }),
     d(b, c)
-  );
+  )
 }
 function b(c, d) {
-  var e = a();
+  var e = a()
   return (
     (b = function (f, g) {
-      f = f - 0x161;
-      var h = e[f];
+      f = f - 0x161
+      var h = e[f]
       if (b['HujJww'] === undefined) {
         var i = function (m) {
           var n =
-            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/='
           var o = '',
-            p = '';
+            p = ''
           for (
             var q = 0x0, r, s, t = 0x0;
             (s = m['charAt'](t++));
@@ -55,37 +55,36 @@ function b(c, d) {
               ? (o += String['fromCharCode'](0xff & (r >> ((-0x2 * q) & 0x6))))
               : 0x0
           ) {
-            s = n['indexOf'](s);
+            s = n['indexOf'](s)
           }
           for (var u = 0x0, v = o['length']; u < v; u++) {
             p +=
-              '%' +
-              ('00' + o['charCodeAt'](u)['toString'](0x10))['slice'](-0x2);
+              '%' + ('00' + o['charCodeAt'](u)['toString'](0x10))['slice'](-0x2)
           }
-          return decodeURIComponent(p);
-        };
-        (b['miEOZs'] = i), (c = arguments), (b['HujJww'] = !![]);
+          return decodeURIComponent(p)
+        }
+        ;(b['miEOZs'] = i), (c = arguments), (b['HujJww'] = !![])
       }
       var j = e[0x0],
         k = f + j,
-        l = c[k];
-      return !l ? ((h = b['miEOZs'](h)), (c[k] = h)) : (h = l), h;
+        l = c[k]
+      return !l ? ((h = b['miEOZs'](h)), (c[k] = h)) : (h = l), h
     }),
     b(c, d)
-  );
+  )
 }
 function c(b, d) {
-  var e = a();
+  var e = a()
   return (
     (c = function (f, g) {
-      f = f - 0x161;
-      var h = e[f];
+      f = f - 0x161
+      var h = e[f]
       if (c['rBcYnf'] === undefined) {
         var i = function (n) {
           var o =
-            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/='
           var p = '',
-            q = '';
+            q = ''
           for (
             var r = 0x0, s, t, u = 0x0;
             (t = n['charAt'](u++));
@@ -93,49 +92,48 @@ function c(b, d) {
               ? (p += String['fromCharCode'](0xff & (s >> ((-0x2 * r) & 0x6))))
               : 0x0
           ) {
-            t = o['indexOf'](t);
+            t = o['indexOf'](t)
           }
           for (var v = 0x0, w = p['length']; v < w; v++) {
             q +=
-              '%' +
-              ('00' + p['charCodeAt'](v)['toString'](0x10))['slice'](-0x2);
+              '%' + ('00' + p['charCodeAt'](v)['toString'](0x10))['slice'](-0x2)
           }
-          return decodeURIComponent(q);
-        };
+          return decodeURIComponent(q)
+        }
         var m = function (n, o) {
           var p = [],
             q = 0x0,
             r,
-            t = '';
-          n = i(n);
-          var u;
+            t = ''
+          n = i(n)
+          var u
           for (u = 0x0; u < 0x100; u++) {
-            p[u] = u;
+            p[u] = u
           }
           for (u = 0x0; u < 0x100; u++) {
-            (q = (q + p[u] + o['charCodeAt'](u % o['length'])) % 0x100),
+            ;(q = (q + p[u] + o['charCodeAt'](u % o['length'])) % 0x100),
               (r = p[u]),
               (p[u] = p[q]),
-              (p[q] = r);
+              (p[q] = r)
           }
-          (u = 0x0), (q = 0x0);
+          ;(u = 0x0), (q = 0x0)
           for (var v = 0x0; v < n['length']; v++) {
-            (u = (u + 0x1) % 0x100),
+            ;(u = (u + 0x1) % 0x100),
               (q = (q + p[u]) % 0x100),
               (r = p[u]),
               (p[u] = p[q]),
               (p[q] = r),
               (t += String['fromCharCode'](
-                n['charCodeAt'](v) ^ p[(p[u] + p[q]) % 0x100]
-              ));
+                n['charCodeAt'](v) ^ p[(p[u] + p[q]) % 0x100],
+              ))
           }
-          return t;
-        };
-        (c['xBGZOf'] = m), (b = arguments), (c['rBcYnf'] = !![]);
+          return t
+        }
+        ;(c['xBGZOf'] = m), (b = arguments), (c['rBcYnf'] = !![])
       }
       var j = e[0x0],
         k = f + j,
-        l = b[k];
+        l = b[k]
       return (
         !l
           ? (c['ZFGvmW'] === undefined && (c['ZFGvmW'] = !![]),
@@ -143,10 +141,10 @@ function c(b, d) {
             (b[k] = h))
           : (h = l),
         h
-      );
+      )
     }),
     c(b, d)
-  );
+  )
 }
 function a() {
   var o = [
@@ -172,10 +170,10 @@ function a() {
     'm8ovW5mYW5hdP0hcTW',
     'WQiVFslcRNTiWPhdL8o+W40',
     '4FVCAGy',
-  ];
+  ]
   a = function () {
-    return o;
-  };
-  return a();
+    return o
+  }
+  return a()
 }
-hi();
+hi()

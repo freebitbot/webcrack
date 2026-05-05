@@ -70,10 +70,10 @@ export class Decoder {
         // decode(test ? 1 : 2) -> test ? decode(1) : decode(2)
         const [replacement] = ref.parentPath!.replaceWith(
           buildExtractedConditional({
-            TEST: conditional.current!.test,
+            ALTERNATE: conditional.current!.alternate,
             CALLEE: ref.parent.callee,
             CONSEQUENT: conditional.current!.consequent,
-            ALTERNATE: conditional.current!.alternate,
+            TEST: conditional.current!.test,
           }),
         )
         // some of the scope information is somehow lost after replacing

@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import controlFlowObject from '../control-flow-object';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import controlFlowObject from '../control-flow-object'
 
-const expectJS = testTransform(controlFlowObject);
+const expectJS = testTransform(controlFlowObject)
 
 // https://github.com/j4k0xb/webcrack/issues/98
 test('inlined object', () => {
@@ -12,7 +12,7 @@ test('inlined object', () => {
         return n === r;
       }
     }).QuFtJ(u, undefined);
-  `).toMatchInlineSnapshot(`u === undefined;`);
+  `).toMatchInlineSnapshot(`u === undefined;`)
 
   expectJS(`
     a = ({
@@ -24,9 +24,9 @@ test('inlined object', () => {
     a = function (n, r) {
       return n === r;
     };
-  `);
+  `)
 
   expectJS(`
     ({ YhxvC: "default" }).YhxvC;
-  `).toMatchInlineSnapshot(`"default";`);
-});
+  `).toMatchInlineSnapshot(`"default";`)
+})

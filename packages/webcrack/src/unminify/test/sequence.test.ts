@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import sequence from '../transforms/sequence';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import sequence from '../transforms/sequence'
 
-const expectJS = testTransform(sequence);
+const expectJS = testTransform(sequence)
 
 test('to statements', () =>
   expectJS(`
@@ -12,7 +12,7 @@ test('to statements', () =>
       b();
       c();
     }
-  `));
+  `))
 
 test('rearrange from return', () =>
   expectJS(`
@@ -25,7 +25,7 @@ test('rearrange from return', () =>
       b();
       return c();
     }
-  `));
+  `))
 
 test('rearrange from if', () =>
   expectJS(`
@@ -33,7 +33,7 @@ test('rearrange from if', () =>
   `).toMatchInlineSnapshot(`
     a();
     if (b()) c();
-  `));
+  `))
 
 test('rearrange from switch', () =>
   expectJS(`
@@ -41,7 +41,7 @@ test('rearrange from switch', () =>
   `).toMatchInlineSnapshot(`
     a();
     switch (b()) {}
-  `));
+  `))
 
 test('throw', () =>
   expectJS(`
@@ -49,7 +49,7 @@ test('throw', () =>
   `).toMatchInlineSnapshot(`
     a();
     throw b();
-  `));
+  `))
 
 test('rearrange from for-in', () =>
   expectJS(`
@@ -57,7 +57,7 @@ test('rearrange from for-in', () =>
   `).toMatchInlineSnapshot(`
     a = 1;
     for (let key in object) {}
-  `));
+  `))
 
 test('rearrange from for-of', () =>
   expectJS(`
@@ -65,7 +65,7 @@ test('rearrange from for-of', () =>
   `).toMatchInlineSnapshot(`
     a = 1;
     for (let value of array) {}
-  `));
+  `))
 
 test('rearrange from for loop init', () => {
   expectJS(`
@@ -74,7 +74,7 @@ test('rearrange from for loop init', () => {
     a();
     b();
     for (;;);
-  `);
+  `)
 
   expectJS(`
     if (1) for ((a(), b());;) {}
@@ -84,8 +84,8 @@ test('rearrange from for loop init', () => {
       b();
       for (;;) {}
     }
-  `);
-});
+  `)
+})
 
 test('rearrange from for loop update', () =>
   expectJS(`
@@ -95,21 +95,21 @@ test('rearrange from for loop update', () =>
       a();
       b();
     }
-  `));
+  `))
 
 test('dont rearrange from while', () =>
   expectJS(`
     while (a(), b()) c();
   `).toMatchInlineSnapshot(`
     while (a(), b()) c();
-  `));
+  `))
 
 test('dont rearrange from do-while', () =>
   expectJS(`
     do {} while (a(), b());
   `).toMatchInlineSnapshot(`
     do {} while (a(), b());
-  `));
+  `))
 
 test('rearrange variable declarator', () => {
   expectJS(`
@@ -117,15 +117,15 @@ test('rearrange variable declarator', () => {
   `).toMatchInlineSnapshot(`
     b();
     var a = c();
-  `);
+  `)
 
   expectJS(`
     for (let a = (b(), c());;) {}
   `).toMatchInlineSnapshot(`
     b();
     for (let a = c();;) {}
-  `);
-});
+  `)
+})
 
 test('rearrange assignment', () => {
   expectJS(`
@@ -133,37 +133,37 @@ test('rearrange assignment', () => {
   `).toMatchInlineSnapshot(`
     b();
     a = c();
-  `);
+  `)
 
   expectJS(`
     a.x = (b(), c());
   `).toMatchInlineSnapshot(`
     b();
     a.x = c();
-  `);
+  `)
 
   expectJS(`
     a[1] = (b(), c());
   `).toMatchInlineSnapshot(`
     b();
     a[1] = c();
-  `);
+  `)
 
   expectJS(`
     a[x()] = (b(), c());
-  `).toMatchInlineSnapshot(`a[x()] = (b(), c());`);
+  `).toMatchInlineSnapshot(`a[x()] = (b(), c());`)
 
   expectJS(`
     console.log(a = (b(), c()));
   `).toMatchInlineSnapshot(`
     console.log((b(), a = c()));
-  `);
+  `)
 
   expectJS(`
     while (a = (b(), c()));
   `).toMatchInlineSnapshot(`
     while (b(), a = c());
-  `);
+  `)
 
   expectJS(`
     a ||= (b(), c());
@@ -173,7 +173,7 @@ test('rearrange assignment', () => {
     a ||= (b(), c());
     a &&= (b(), c());
     a ??= (b(), c());
-  `);
+  `)
 
   expectJS(`
     for (;;) a = (b(), c());
@@ -182,11 +182,11 @@ test('rearrange assignment', () => {
       b();
       a = c();
     }
-  `);
-});
+  `)
+})
 
 // appears in some obfuscator.io forks
 test('simplify computed property with only literals', () =>
   expectJS(`
     Lr[("nnQB", "jcIgN")]();
-  `).toMatchInlineSnapshot('Lr["jcIgN"]();'));
+  `).toMatchInlineSnapshot('Lr["jcIgN"]();'))

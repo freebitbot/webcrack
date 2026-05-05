@@ -1,48 +1,44 @@
 {
-  "name": "webcrack",
-  "version": "2.16.0",
-  "description": "Deobfuscate, unminify and unpack bundled javascript",
   "author": "j4k0xb",
-  "license": "MIT",
-  "type": "module",
   "bin": "src/cli-wrapper.js",
-  "main": "dist/index.cjs",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.cjs"
-      }
-    }
+  "dependencies": {
+    "@babel/generator": "^7.29.1",
+    "@babel/helper-validator-identifier": "^7.28.5",
+    "@babel/parser": "^7.29.2",
+    "@babel/template": "^7.28.6",
+    "@babel/traverse": "^7.29.0",
+    "@babel/types": "^7.29.0",
+    "@codemod/matchers": "^1.7.1",
+    "debug": "^4.4.3",
+    "isolated-vm": "^6.1.2"
   },
-  "files": [
-    "dist",
-    "src/cli-wrapper.js"
-  ],
+  "description": "Deobfuscate, unminify and unpack bundled javascript",
+  "devDependencies": {
+    "@types/babel__generator": "^7.27.0",
+    "@types/babel__helper-validator-identifier": "^7.15.2",
+    "@types/babel__template": "^7.4.4",
+    "@types/babel__traverse": "^7.28.0",
+    "@types/debug": "^4.1.13",
+    "@types/node": "^25.6.0",
+    "@webcrack/typescript-config": "workspace:*",
+    "typescript": "^6.0.3"
+  },
   "engines": {
     "node": ">=22.0.0 <23 || >=24.0.0 <25"
   },
-  "scripts": {
-    "build": "node esbuild.config.js && tsc -p tsconfig.build.json",
-    "watch": "node esbuild.config.js --watch",
-    "start": "node dist/cli.js",
-    "tmp": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
-    "lint": "eslint src test",
-    "lint:fix": "eslint src test --fix",
-    "format:check": "prettier --check \"{src,test}/**/*.ts\"",
-    "format": "prettier --write \"{src,test}/**/*.ts\"",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest --no-isolate"
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.ts"
+      }
+    }
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/j4k0xb/webcrack"
-  },
+  "files": ["dist", "src/cli-wrapper.js"],
   "homepage": "https://webcrack.netlify.app",
   "keywords": [
     "webpack",
@@ -57,25 +53,26 @@
     "unminify",
     "unbundle"
   ],
-  "dependencies": {
-    "@babel/generator": "^7.29.1",
-    "@babel/helper-validator-identifier": "^7.28.5",
-    "@babel/parser": "^7.29.2",
-    "@babel/template": "^7.28.6",
-    "@babel/traverse": "^7.29.0",
-    "@babel/types": "^7.29.0",
-    "@codemod/matchers": "^1.7.1",
-    "debug": "^4.4.3",
-    "isolated-vm": "^6.1.2"
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "name": "webcrack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/j4k0xb/webcrack"
   },
-  "devDependencies": {
-    "@types/babel__generator": "^7.27.0",
-    "@types/babel__helper-validator-identifier": "^7.15.2",
-    "@types/babel__template": "^7.4.4",
-    "@types/babel__traverse": "^7.28.0",
-    "@types/debug": "^4.1.13",
-    "@types/node": "^25.6.0",
-    "@webcrack/typescript-config": "workspace:*",
-    "typescript": "^6.0.3"
-  }
+  "scripts": {
+    "build": "node esbuild.config.js && tsc -p tsconfig.build.json",
+    "format": "prettier --write \"{src,test}/**/*.ts\"",
+    "format:check": "prettier --check \"{src,test}/**/*.ts\"",
+    "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
+    "start": "node dist/cli.js",
+    "test": "vitest --no-isolate",
+    "tmp": "node esbuild.config.js && node --enable-source-maps dist/cli.js tmp/test.js -f -o tmp/webcrack-out",
+    "typecheck": "tsc --noEmit",
+    "watch": "node esbuild.config.js --watch"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "version": "2.16.0"
 }

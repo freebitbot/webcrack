@@ -1,15 +1,15 @@
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import type { Transform } from '../../ast-utils';
-import { isTemporaryVariable } from '../../ast-utils';
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import type { Transform } from '../../ast-utils'
+import { isTemporaryVariable } from '../../ast-utils'
 
 export default {
   name: 'optional-chaining',
-  tags: ['safe'],
   scope: true,
+  tags: ['safe'],
   visitor() {
-    const object = m.capture(m.anyExpression());
-    const member = m.capture(m.memberExpression(m.fromCapture(object)));
+    const object = m.capture(m.anyExpression())
+    const member = m.capture(m.memberExpression(m.fromCapture(object)))
     // Example (TS): object === null || object === undefined ? undefined : object.property;
     const simpleMatcher = m.conditionalExpression(
       m.logicalExpression(
@@ -23,10 +23,10 @@ export default {
       ),
       m.identifier('undefined'),
       member,
-    );
+    )
 
-    const tmpVar = m.capture(m.identifier());
-    const tmpMember = m.capture(m.memberExpression(m.fromCapture(tmpVar)));
+    const tmpVar = m.capture(m.identifier())
+    const tmpMember = m.capture(m.memberExpression(m.fromCapture(tmpVar)))
     // Example (Babel): var _tmp; (_tmp = object) === null || _tmp === undefined ? undefined : _tmp.property;
     const tmpMatcher = m.conditionalExpression(
       m.logicalExpression(
@@ -44,13 +44,13 @@ export default {
       ),
       m.identifier('undefined'),
       tmpMember,
-    );
+    )
 
     return {
       ConditionalExpression: {
         exit(path) {
           if (simpleMatcher.match(path.node)) {
-            member.current!.optional = true;
+            member.current!.optional = true
             path.replaceWith(
               t.optionalMemberExpression(
                 object.current!,
@@ -58,14 +58,14 @@ export default {
                 member.current!.computed,
                 true,
               ),
-            );
-            this.changes++;
+            )
+            this.changes++
           } else if (tmpMatcher.match(path.node)) {
-            const binding = path.scope.getBinding(tmpVar.current!.name);
-            if (!isTemporaryVariable(binding, 2)) return;
+            const binding = path.scope.getBinding(tmpVar.current!.name)
+            if (!isTemporaryVariable(binding, 2)) return
 
-            binding.path.remove();
-            tmpMember.current!.optional = true;
+            binding.path.remove()
+            tmpMember.current!.optional = true
             path.replaceWith(
               t.optionalMemberExpression(
                 object.current!,
@@ -73,11 +73,11 @@ export default {
                 tmpMember.current!.computed,
                 true,
               ),
-            );
-            this.changes++;
+            )
+            this.changes++
           }
         },
       },
-    };
+    }
   },
-} satisfies Transform;
+} satisfies Transform

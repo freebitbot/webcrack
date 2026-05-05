@@ -1,7 +1,7 @@
 // v4.0.0
-(function (b, e) {
+;(function (b, e) {
   var k = d,
-    f = b();
+    f = b()
   while (!![]) {
     try {
       var g =
@@ -15,14 +15,14 @@
           (-parseInt(k(0xbe)) / (-0x11c3 * 0x2 + -0x9d1 + 0x17 * 0x1f9)) +
         -parseInt(k(0xbf)) / (-0x40 * 0x94 + 0x29 * 0x59 + 0x16c8) +
         (-parseInt(k(0xc0)) / (-0x1 * 0x1675 + -0x2325 + 0x39a4)) *
-          (-parseInt(k(0xc1)) / (0x1c66 + -0x216f + -0xa * -0x82));
-      if (g === e) break;
-      else f['push'](f['shift']());
+          (-parseInt(k(0xc1)) / (0x1c66 + -0x216f + -0xa * -0x82))
+      if (g === e) break
+      else f['push'](f['shift']())
     } catch (h) {
-      f['push'](f['shift']());
+      f['push'](f['shift']())
     }
   }
-})(c, -0x1021e + -0x7eac8 + 0x17 * 0xac9c);
+})(c, -0x1021e + -0x7eac8 + 0x17 * 0xac9c)
 function c() {
   var o = [
     'while\x20(true)\x20{}',
@@ -50,77 +50,77 @@ function c() {
     'log',
     'Hello\x20World!',
     'constructor',
-  ];
+  ]
   c = function () {
-    return o;
-  };
-  return c();
+    return o
+  }
+  return c()
 }
 function hi() {
   var m = d,
     e = (function () {
-      var f = !![];
+      var f = !![]
       return function (g, h) {
         var i = f
           ? function () {
               if (h) {
-                var j = h['apply'](g, arguments);
-                return (h = null), j;
+                var j = h['apply'](g, arguments)
+                return (h = null), j
               }
             }
-          : function () {};
-        return (f = ![]), i;
-      };
-    })();
-  (function () {
+          : function () {}
+        return (f = ![]), i
+      }
+    })()
+  ;(function () {
     e(this, function () {
       var l = d,
         f = new RegExp(l(0xc2)),
         g = new RegExp(l(0xc3), 'i'),
-        h = a(l(0xc4));
-      !f[l(0xc5)](h + l(0xc6)) || !g[l(0xc5)](h + 'input') ? h('0') : a();
-    })();
+        h = a(l(0xc4))
+      !f[l(0xc5)](h + l(0xc6)) || !g[l(0xc5)](h + 'input') ? h('0') : a()
+    })()
   })(),
-  console[m(0xc7)](m(0xc8));
-  console[m(0xc7)](m(0xc811));
-  console[m(0xc7)](m(-0x1));
-  const p = true;
-  console[m(0xc7)](m(p ? 0xc7 : 0xc8));
+    console[m(0xc7)](m(0xc8))
+  console[m(0xc7)](m(0xc811))
+  console[m(0xc7)](m(-0x1))
+  const p = true
+  console[m(0xc7)](m(p ? 0xc7 : 0xc8))
 }
 function d(a, b) {
-  var e = c();
+  var e = c()
   return (
     (d = function (f, g) {
-      f = f - (-0x160f * 0x1 + -0x145a + 0x2b20);
-      var h = e[f];
-      return h;
+      f = f - (-0x160f * 0x1 + -0x145a + 0x2b20)
+      var h = e[f]
+      return h
     }),
     d(a, b)
-  );
+  )
 }
-hi();
+hi()
 function a(b) {
   function e(f) {
-    var n = d;
+    var n = d
     if (typeof f === 'string')
-      return function (g) {}[n(0xc9)](n(0xca))[n(0xcb)](n(0xcc));
+      return function (g) {}[n(0xc9)](n(0xca))[n(0xcb)](n(0xcc))
     else
       ('' + f / f)['length'] !== 0x23e3 + 0x12ff + -0x3 * 0x124b ||
       f % (0x41 * -0x86 + 0x2a6 + 0x1f74) === 0x19d * 0x5 + -0xf08 + 0x1 * 0x6f7
         ? function () {
-            return !![];
+            return !![]
           }
             [n(0xc9)](n(0xcd) + n(0xce))
             [n(0xcf)]('action')
         : function () {
-            return ![];
+            return ![]
           }
             [n(0xc9)](n(0xcd) + n(0xce))
-            ['apply']('stateObject');
-    e(++f);
+            ['apply']('stateObject')
+    e(++f)
   }
   try {
-    if (b) return e;
-    else e(-0x392 + 0x3f1 * -0x7 + 0x1f29);
+    if (b) return e
+    else e(-0x392 + 0x3f1 * -0x7 + 0x1f29)
   } catch (f) {}
 }

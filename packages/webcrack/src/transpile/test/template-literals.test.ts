@@ -1,13 +1,13 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import templateLiterals from '../transforms/template-literals';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import templateLiterals from '../transforms/template-literals'
 
-const expectJS = testTransform(templateLiterals);
+const expectJS = testTransform(templateLiterals)
 
 test('escape sequences', () =>
   expectJS(
     `"'".concat(foo, "' \\"").concat(bar, "\\"").concat("$\\0\\b\\f\\n\\r\\t\\v");`,
-  ).toMatchInlineSnapshot(`\`'\${foo}' "\${bar}"\\$\\0\\b\\f\n\\r\\t\\v\`;`));
+  ).toMatchInlineSnapshot(`\`'\${foo}' "\${bar}"\\$\\0\\b\\f\n\\r\\t\\v\`;`))
 
 test('expressions', () =>
   expectJS(`
@@ -20,7 +20,7 @@ test('expressions', () =>
     \`\${1}\${foo}\${bar}\${baz}\`;
     \`\${1}\${foo}bar\${baz}\`;
     \`\${1}\${f}oo\${true}\${b}ar\${0}\${baz}\`;
-  `));
+  `))
 
 test('merge concatenations', () =>
   expectJS(`
@@ -35,4 +35,4 @@ test('merge concatenations', () =>
     \`a\${1}b\${2}\`;
     \`ca\${1}b\`;
     \`\${2}a\${1}b\`;
-  `));
+  `))

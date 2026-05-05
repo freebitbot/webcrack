@@ -16,9 +16,9 @@ export function createNodeSandbox(): Sandbox {
     const isolate = new Isolate()
     const context = await isolate.createContext()
     const result = (await context.eval(code, {
-      timeout: 10_000,
       copy: true,
       filename: 'file:///obfuscated.js',
+      timeout: 10_000,
     })) as unknown
     context.release()
     isolate.dispose()

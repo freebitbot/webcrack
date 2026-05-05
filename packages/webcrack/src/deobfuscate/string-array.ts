@@ -11,11 +11,11 @@ import {
 } from '../ast-utils'
 
 export interface StringArray {
-  path: NodePath<t.FunctionDeclaration>
-  references: NodePath[]
+  length: number
   name: string
   originalName: string
-  length: number
+  path: NodePath<t.FunctionDeclaration>
+  references: NodePath[]
 }
 
 export function findStringArray(ast: t.Node): StringArray | undefined {
@@ -73,11 +73,11 @@ export function findStringArray(ast: t.Node): StringArray | undefined {
         renameFast(binding, '__STRING_ARRAY__')
 
         result = {
+          length,
+          name: '__STRING_ARRAY__',
+          originalName: name,
           path,
           references: binding.referencePaths,
-          originalName: name,
-          name: '__STRING_ARRAY__',
-          length,
         }
         path.stop()
       }

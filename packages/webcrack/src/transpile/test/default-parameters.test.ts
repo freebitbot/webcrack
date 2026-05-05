@@ -1,8 +1,8 @@
-import { describe, test } from 'vitest';
-import { testTransform } from '../../../test';
-import { defaultParameters } from '../transforms';
+import { describe, test } from 'vitest'
+import { testTransform } from '../../../test'
+import { defaultParameters } from '../transforms'
 
-const expectJS = testTransform(defaultParameters);
+const expectJS = testTransform(defaultParameters)
 
 describe('Babel', () => {
   test('multiple default parameters', () =>
@@ -13,7 +13,7 @@ describe('Babel', () => {
       }
     `).toMatchInlineSnapshot(`
       function f(e = "foo", f = 5) {}
-    `));
+    `))
 
   test('default parameter before the last one', () =>
     expectJS(`
@@ -23,7 +23,7 @@ describe('Babel', () => {
       }
     `).toMatchInlineSnapshot(`
       function f(x = 1, y) {}
-    `));
+    `))
 
   test('default parameter with value true and false', () =>
     expectJS(`
@@ -33,7 +33,7 @@ describe('Babel', () => {
       }
     `).toMatchInlineSnapshot(`
       function f(x = false, y = true) {}
-    `));
+    `))
 
   test('default parameter with gap before the last one', () =>
     expectJS(`
@@ -43,7 +43,7 @@ describe('Babel', () => {
       }
     `).toMatchInlineSnapshot(`
       function f(e, x = {}, _param, _param2, _param3, y) {}
-    `));
+    `))
 
   test('default destructuring parameter', () =>
     expectJS(`
@@ -59,7 +59,7 @@ describe('Babel', () => {
         x,
         y
       } = {}, [z] = []) {}
-    `));
+    `))
 
   test('default parameter (loose)', () =>
     expectJS(`
@@ -68,7 +68,7 @@ describe('Babel', () => {
       }
     `).toMatchInlineSnapshot(`
       function f(x = 1, y) {}
-    `));
+    `))
 
   test('ignore when other statements are in between', () =>
     expectJS(`
@@ -84,5 +84,5 @@ describe('Babel', () => {
           y = 1;
         }
       }
-    `));
-});
+    `))
+})

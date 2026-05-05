@@ -1,12 +1,12 @@
-import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
-import type { Bundle } from '..';
-import type { Transform } from '../../ast-utils';
-import { constMemberExpression, renameParameters } from '../../ast-utils';
-import { WebpackBundle } from './bundle';
-import { getModuleFunctions, modulesContainerMatcher } from './common-matchers';
-import { WebpackModule } from './module';
+import type { NodePath } from '@babel/traverse'
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
+import type { Transform } from '../../ast-utils'
+import { constMemberExpression, renameParameters } from '../../ast-utils'
+import type { Bundle } from '..'
+import { WebpackBundle } from './bundle'
+import { getModuleFunctions, modulesContainerMatcher } from './common-matchers'
+import { WebpackModule } from './module'
 
 /**
  * Format:
@@ -16,10 +16,10 @@ import { WebpackModule } from './module';
  */
 export default {
   name: 'unpack-webpack-chunk',
-  tags: ['unsafe'],
   scope: true,
+  tags: ['unsafe'],
   visitor(options = { bundle: undefined }) {
-    const container = modulesContainerMatcher();
+    const container = modulesContainerMatcher()
 
     // Examples: self.webpackChunk_N_E, window.webpackJsonp, this.webpackJsonp
     const jsonpGlobal = m.capture(
@@ -27,11 +27,11 @@ export default {
         m.or(m.identifier(), m.thisExpression()),
         m.matcher((property) => property.startsWith('webpack')),
       ),
-    );
+    )
 
     const chunkIds = m.capture(
       m.arrayOf(m.or(m.numericLiteral(), m.stringLiteral())),
-    );
+    )
     const matcher = m.callExpression(
       constMemberExpression(
         m.assignmentExpression(
@@ -55,28 +55,28 @@ export default {
           ),
         ),
       ],
-    );
+    )
 
     return {
       CallExpression(path) {
-        if (!matcher.match(path.node)) return;
-        path.stop();
+        if (!matcher.match(path.node)) return
+        path.stop()
 
-        const modules = new Map<string, WebpackModule>();
+        const modules = new Map<string, WebpackModule>()
 
         const containerPath = path.get(
           container.currentKeys!.join('.'),
-        ) as NodePath<t.ArrayExpression | t.ObjectExpression>;
+        ) as NodePath<t.ArrayExpression | t.ObjectExpression>
 
         for (const [id, func] of getModuleFunctions(containerPath)) {
-          renameParameters(func, ['module', 'exports', 'require']);
-          const isEntry = false; // FIXME: afaik after the modules there can be a function that specifies the entry point
-          const file = t.file(t.program(func.node.body.body));
-          modules.set(id, new WebpackModule(id, file, isEntry));
+          renameParameters(func, ['module', 'exports', 'require'])
+          const isEntry = false // FIXME: afaik after the modules there can be a function that specifies the entry point
+          const file = t.file(t.program(func.node.body.body))
+          modules.set(id, new WebpackModule(id, file, isEntry))
         }
 
-        options.bundle = new WebpackBundle('', modules);
+        options.bundle = new WebpackBundle('', modules)
       },
-    };
+    }
   },
-} satisfies Transform<{ bundle: Bundle | undefined }>;
+} satisfies Transform<{ bundle: Bundle | undefined }>

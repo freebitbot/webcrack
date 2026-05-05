@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import nullishCoalescing from '../transforms/nullish-coalescing';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import nullishCoalescing from '../transforms/nullish-coalescing'
 
-const expectJS = testTransform(nullishCoalescing);
+const expectJS = testTransform(nullishCoalescing)
 
 // TODO: group by tool
 
@@ -12,17 +12,17 @@ test('identifier (Babel)', () =>
     (_a = a) !== null && _a !== undefined ? _a : b;
   `).toMatchInlineSnapshot(`
     a ?? b;
-  `));
+  `))
 
 test('identifier (SWC/esbuild)', () =>
   expectJS(`
     a != null ? a : b;
-  `).toMatchInlineSnapshot(`a ?? b;`));
+  `).toMatchInlineSnapshot(`a ?? b;`))
 
 test('identifier (TS)', () =>
   expectJS(`
     a !== null && a !== undefined ? a : b;
-  `).toMatchInlineSnapshot(`a ?? b;`));
+  `).toMatchInlineSnapshot(`a ?? b;`))
 
 test('member expression (Babel)', () =>
   expectJS(`
@@ -30,7 +30,7 @@ test('member expression (Babel)', () =>
     (_a$b = a.b) !== null && _a$b !== undefined ? _a$b : c;
   `).toMatchInlineSnapshot(`
     a.b ?? c;
-  `));
+  `))
 
 test('member expression loose (Babel)', () =>
   expectJS(`
@@ -38,7 +38,7 @@ test('member expression loose (Babel)', () =>
     var foo = (_opts$foo = opts.foo) != null ? _opts$foo : "default";
   `).toMatchInlineSnapshot(`
     var foo = opts.foo ?? "default";
-  `));
+  `))
 
 test.todo('member expression (esbuild)', () =>
   expectJS(`
@@ -46,8 +46,7 @@ test.todo('member expression (esbuild)', () =>
     ((_a_b = a.b) !== null && _a_b !== undefined) || c;
   `).toMatchInlineSnapshot(`
     a.b ?? c;
-  `),
-);
+  `))
 
 test('default param (Babel)', () =>
   expectJS(`
@@ -56,7 +55,7 @@ test('default param (Babel)', () =>
   `).toMatchInlineSnapshot(`
     function foo(foo, qux = foo.bar ?? "qux") {}
     function bar(bar, qux = bar ?? "qux") {}
-  `));
+  `))
 
 // TODO: add unminify transform or different matchers?
 test.todo('flipped', () =>
@@ -65,5 +64,4 @@ test.todo('flipped', () =>
     (interp = hello) == null ? "" : interp;
   `).toMatchInlineSnapshot(`
     hello ?? "";
-  `),
-);
+  `))

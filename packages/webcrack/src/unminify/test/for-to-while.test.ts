@@ -1,14 +1,14 @@
-import { test } from 'vitest';
-import { testTransform } from '../../../test';
-import forToWhile from '../transforms/for-to-while';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import forToWhile from '../transforms/for-to-while'
 
-const expectJS = testTransform(forToWhile);
+const expectJS = testTransform(forToWhile)
 
 test('empty for loop to while true', () =>
-  expectJS(`for (;;) b()`).toMatchInlineSnapshot(`while (true) b();`));
+  expectJS(`for (;;) b()`).toMatchInlineSnapshot(`while (true) b();`))
 
 test('for loop with only test to while', () =>
-  expectJS(`for (; a(); ) b();`).toMatchInlineSnapshot(`while (a()) b();`));
+  expectJS(`for (; a(); ) b();`).toMatchInlineSnapshot(`while (a()) b();`))
 
 test('ignore for loop with init or update', () =>
   expectJS(`
@@ -17,4 +17,4 @@ test('ignore for loop with init or update', () =>
   `).toMatchInlineSnapshot(`
     for (let i = 0;;) {}
     for (;; i++) {}
-  `));
+  `))

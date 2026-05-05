@@ -23,8 +23,8 @@ import {
  */
 export default {
   name: 'merge-object-assignments',
-  tags: ['safe'],
   scope: true,
+  tags: ['safe'],
   visitor: () => {
     const id = m.capture(m.identifier())
     const object = m.capture(m.objectExpression([]))
@@ -43,10 +43,6 @@ export default {
     )
 
     return {
-      Program(path) {
-        // No idea why this is needed, crashes otherwise.
-        path.scope.crawl()
-      },
       'ExpressionStatement|VariableDeclaration': {
         exit(path) {
           if (!path.inList || !varMatcher.match(path.node)) return
@@ -90,6 +86,10 @@ export default {
             }
           }
         },
+      },
+      Program(path) {
+        // No idea why this is needed, crashes otherwise.
+        path.scope.crawl()
       },
     }
   },

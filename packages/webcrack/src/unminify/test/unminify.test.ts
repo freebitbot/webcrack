@@ -1,8 +1,8 @@
-import { test } from 'vitest';
-import unminify from '..';
-import { testTransform } from '../../../test';
+import { test } from 'vitest'
+import { testTransform } from '../../../test'
+import unminify from '..'
 
-const expectJS = testTransform(unminify);
+const expectJS = testTransform(unminify)
 
 test('mixed typeof-undefined and yoda', () =>
   expectJS(`
@@ -15,4 +15,4 @@ test('mixed typeof-undefined and yoda', () =>
     typeof x !== "undefined";
     typeof x === "undefined";
     typeof x === "undefined";
-  `));
+  `))

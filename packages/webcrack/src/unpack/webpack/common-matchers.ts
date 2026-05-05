@@ -1,17 +1,17 @@
-import type { Binding, NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
-import * as m from '@codemod/matchers';
+import type { Binding, NodePath } from '@babel/traverse'
+import * as t from '@babel/types'
+import * as m from '@codemod/matchers'
 import {
   anonymousFunction,
   anySubList,
   constMemberExpression,
   getPropName,
-} from '../../ast-utils';
+} from '../../ast-utils'
 
 export type FunctionPath = NodePath<
   | t.FunctionExpression
   | (t.ArrowFunctionExpression & { body: t.BlockStatement })
->;
+>
 
 /**
  * @returns
@@ -20,7 +20,7 @@ export type FunctionPath = NodePath<
  */
 export function webpackRequireFunctionMatcher() {
   // Example: __webpack_modules__
-  const containerId = m.capture(m.identifier());
+  const containerId = m.capture(m.identifier())
   const webpackRequire = m.capture(
     m.functionDeclaration(
       m.identifier(), // __webpack_require__
@@ -52,9 +52,9 @@ export function webpackRequireFunctionMatcher() {
         ),
       ),
     ),
-  );
+  )
 
-  return { webpackRequire, containerId };
+  return { containerId, webpackRequire }
 }
 
 /**
@@ -81,7 +81,7 @@ export function modulesContainerMatcher(): m.CapturedMatcher<
         ),
       ),
     ),
-  );
+  )
 }
 
 /**
@@ -91,7 +91,7 @@ export function modulesContainerMatcher(): m.CapturedMatcher<
 export function getModuleFunctions(
   container: NodePath<t.ArrayExpression | t.ObjectExpression>,
 ): Map<string, FunctionPath> {
-  const functions = new Map<string, FunctionPath>();
+  const functions = new Map<string, FunctionPath>()
 
   if (t.isArrayExpression(container.node)) {
     container.node.elements.forEach((element, index) => {
@@ -99,39 +99,39 @@ export function getModuleFunctions(
         functions.set(
           index.toString(),
           container.get(`elements.${index}`) as FunctionPath,
-        );
+        )
       }
-    });
+    })
   } else {
-    (container.node.properties as t.ObjectProperty[]).forEach(
+    ;(container.node.properties as t.ObjectProperty[]).forEach(
       (property, index) => {
-        const key = getPropName(property.key)!;
+        const key = getPropName(property.key)!
         if (anonymousFunction().match(property.value)) {
           functions.set(
             key,
             container.get(`properties.${index}.value`) as FunctionPath,
-          );
+          )
         }
       },
-    );
+    )
   }
 
-  return functions;
+  return functions
 }
 
 /**
  * Matches `__webpack_require__.s = <id>`
  */
 export function findAssignedEntryId(webpackRequireBinding: Binding) {
-  const entryId = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
+  const entryId = m.capture(m.or(m.numericLiteral(), m.stringLiteral()))
   const assignment = m.assignmentExpression(
     '=',
     constMemberExpression(webpackRequireBinding.identifier.name, 's'),
     entryId,
-  );
+  )
   for (const reference of webpackRequireBinding.referencePaths) {
     if (assignment.match(reference.parentPath?.parent)) {
-      return String(entryId.current!.value);
+      return String(entryId.current!.value)
     }
   }
 }
@@ -140,14 +140,14 @@ export function findAssignedEntryId(webpackRequireBinding: Binding) {
  * Matches `__webpack_require__(<id>)`
  */
 export function findRequiredEntryId(webpackRequireBinding: Binding) {
-  const entryId = m.capture(m.or(m.numericLiteral(), m.stringLiteral()));
+  const entryId = m.capture(m.or(m.numericLiteral(), m.stringLiteral()))
   const call = m.callExpression(
     m.identifier(webpackRequireBinding.identifier.name),
     [entryId],
-  );
+  )
   for (const reference of webpackRequireBinding.referencePaths) {
     if (call.match(reference.parent)) {
-      return String(entryId.current!.value);
+      return String(entryId.current!.value)
     }
   }
 }

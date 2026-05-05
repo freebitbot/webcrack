@@ -2,26 +2,26 @@ window.__require = (function t(e, n, i) {
   function r(a, o) {
     if (!n[a]) {
       if (!e[a]) {
-        var l = a.split('/');
-        l = l[l.length - 1];
+        var l = a.split('/')
+        l = l[l.length - 1]
         if (!e[l]) {
-          var c = typeof __require == 'function' && __require;
+          var c = typeof __require == 'function' && __require
           if (!o && c) {
-            return c(l, true);
+            return c(l, true)
           }
           if (s) {
-            return s(l, true);
+            return s(l, true)
           }
-          throw new Error("Cannot find module '" + a + "'");
+          throw new Error("Cannot find module '" + a + "'")
         }
       }
       var u = (n[a] = {
         exports: {},
-      });
+      })
       e[a][0].call(
         u.exports,
         function (t) {
-          return r(e[a][1][t] || t);
+          return r(e[a][1][t] || t)
         },
         u,
         u.exports,
@@ -29,15 +29,15 @@ window.__require = (function t(e, n, i) {
         e,
         n,
         i,
-      );
+      )
     }
-    return n[a].exports;
+    return n[a].exports
   }
-  var s = typeof __require == 'function' && __require;
+  var s = typeof __require == 'function' && __require
   for (var a = 0; a < i.length; a++) {
-    r(i[a]);
+    r(i[a])
   }
-  return r;
+  return r
 })(
   {
     BattleHint: [function (t, e, n) {}, {}],
@@ -46,4 +46,4 @@ window.__require = (function t(e, n, i) {
   },
   {},
   ['BattleHint', 'GChangeCount'],
-);
+)
