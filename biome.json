@@ -13,7 +13,10 @@
     },
     "enabled": true
   },
-  "files": { "ignoreUnknown": false },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": ["**", "!samples"]
+  },
   "formatter": {
     "attributePosition": "auto",
     "bracketSameLine": false,
@@ -34,6 +37,7 @@
     }
   },
   "javascript": {
+    "experimentalEmbeddedSnippetsEnabled": true,
     "formatter": {
       "arrowParentheses": "always",
       "attributePosition": "auto",
@@ -45,11 +49,28 @@
       "semicolons": "asNeeded",
       "trailingCommas": "all"
     },
-    "globals": []
+    "globals": [],
+    "linter": { "enabled": true },
+    "parser": {
+      "jsxEverywhere": true,
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    },
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": true
+    }
   },
   "linter": {
+    "domains": {
+      "types": "all"
+    },
     "enabled": true,
-    "includes": ["**", "!**/*.js"],
+    "includes": ["**", "!**/*.js", "!samples/*.js"],
     "rules": {
       "complexity": {
         "noAdjacentSpacesInRegex": "error",
