@@ -16,6 +16,7 @@
     },
     "apps/docs": {
       "name": "docs",
+      "version": "0.0.0",
       "devDependencies": {
         "@webcrack/eslint-config": "workspace:*",
         "@webcrack/typescript-config": "workspace:*",
@@ -25,6 +26,7 @@
     },
     "apps/playground": {
       "name": "playground",
+      "version": "0.0.0",
       "dependencies": {
         "@babel/generator": "^7.29.1",
         "@babel/types": "^7.29.0",
@@ -53,6 +55,7 @@
     },
     "apps/web": {
       "name": "web",
+      "version": "0.0.0",
       "dependencies": {
         "docs": "workspace:*",
         "playground": "workspace:*",
@@ -60,6 +63,7 @@
     },
     "packages/config-eslint": {
       "name": "@webcrack/eslint-config",
+      "version": "0.0.0",
       "dependencies": {
         "@eslint/js": "^10.0.1",
         "eslint": "^10.2.1",
@@ -69,9 +73,11 @@
     },
     "packages/config-typescript": {
       "name": "@webcrack/typescript-config",
+      "version": "0.0.0",
     },
     "packages/webcrack": {
       "name": "webcrack",
+      "version": "2.16.0",
       "bin": "src/cli-wrapper.js",
       "dependencies": {
         "@babel/generator": "^7.29.1",
@@ -98,6 +104,9 @@
         "typescript": "^6.0.3",
       },
     },
+  },
+  "patchedDependencies": {
+    "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch",
   },
   "packages": {
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
