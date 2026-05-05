@@ -65,7 +65,6 @@
     "@babel/traverse": "^7.29.0",
     "@babel/types": "^7.29.0",
     "@codemod/matchers": "^1.7.1",
-    "commander": "^14.0.3",
     "debug": "^4.4.3",
     "isolated-vm": "^6.1.2"
   },
@@ -76,9 +75,7 @@
     "@types/babel__traverse": "^7.28.0",
     "@types/debug": "^4.1.13",
     "@types/node": "^25.6.0",
-    "@webcrack/eslint-config": "workspace:*",
     "@webcrack/typescript-config": "workspace:*",
-    "esbuild": "^0.28.0",
     "typescript": "^6.0.3"
   }
 }
